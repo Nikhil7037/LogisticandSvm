@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -140,52 +141,49 @@ print(df.head())
 X = df[['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi']]
 y = df['stroke']
 
-
-
-
-
 from sklearn.model_selection import train_test_split
 #random_state: set seed for random# generator
 #test_size: default 25% testing, 75% training
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
 
-from sklearn.linear_model import LogisticRegression
-lr = LogisticRegression(solver='liblinear',class_weight={0:0.1,1:0.9} )
-lr.fit(X_train, y_train)
-y_pred=lr.predict(X_test)
-
-# Coefficients of linear model (b_1,b_2,...,b_p): log(p/(1-p)) = b0+b_1x_1+b_2x_2+...+b_px_p
-print("lr.coef_: {}".format(lr.coef_))
-print("lr.intercept_: {}".format(lr.intercept_))
-
-print("Training set score: {:.2f}".format(lr.score(X_train, y_train)))
-print("Test set score: {:.2f}".format(lr.score(X_test, y_test)))
-
-from sklearn.metrics import confusion_matrix
-matrix=confusion_matrix(y_test,y_pred)
-print(matrix)
-
-from sklearn.metrics import plot_confusion_matrix
-
-#plot_confusion_matrix(lr, X_test, y_test)
-#plt.show()
 
 
+# kernals could be: ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’. Try them.
+from sklearn import svm
+clfsvm = svm.SVC(kernel='linear',class_weight='balanced')
+clfsvm.fit(X_train, y_train)
+y_pred=clfsvm.predict(X_test)
 
+#### See which data points are critical #####
+# get the support vectors
+print("clfsvm support vectors: {}".format(clfsvm.support_vectors_))
+# get indices of support vectors
+print("clfsvm support vector indices: {}".format(clfsvm.support_))
+# get number of support vectors for each class
+print("clfsvm # of support vectors in each class: {}".format(clfsvm.n_support_))
+
+# Estimate the accuracy of the classifier on future data, using the test data
+##########################################################################################
+print("Training set score: {:.2f}".format(clfsvm.score(X_train, y_train)))
+print("Test set score: {:.2f}".format(clfsvm.score(X_test, y_test)))
+
+fruit_prediction = clfsvm.predict(X_test)
+compare = pd.DataFrame({'true': y_test, 'predicted': fruit_prediction})
+print("true vs predicted\n", compare)
 
 # first example: a small fruit with mass 15g, color_score = 5.5, width 4.3 cm, height 5.5 cm
 testFruit = pd.DataFrame([[101, 1, 1, 202.21,1,2,1,2,1,36.6]], columns=['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi'])
-fruit_prediction = lr.predict(testFruit)
+fruit_prediction = clfsvm.predict(testFruit)
 print(fruit_prediction)
 
 # second example: a small fruit with mass 15g, color_score = 5.5, width 4.3 cm, height 5.5 cm
 testFruit = pd.DataFrame([[75, 1, 1, 212.21,1,2,1,2,1,55]], columns=['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi'])
-fruit_prediction = lr.predict(testFruit)
+fruit_prediction = clfsvm.predict(testFruit)
 print(fruit_prediction)
 
 # second example: a small fruit with mass 15g, color_score = 5.5, width 4.3 cm, height 5.5 cm
 testFruit = pd.DataFrame([[35, 1, 1, 212.21,1,2,1,2,1,55]], columns=['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi'])
-fruit_prediction = lr.predict(testFruit)
+fruit_prediction = clfsvm.predict(testFruit)
 print(fruit_prediction)
 
 
@@ -196,4 +194,6 @@ print(fruit_prediction)
 
 
 
-
+from sklearn.metrics import confusion_matrix
+matrix=confusion_matrix(y_test,y_pred)
+print(matrix)
