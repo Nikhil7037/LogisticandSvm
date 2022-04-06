@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from imblearn.over_sampling import SMOTE, RandomOverSampler
 from sklearn.preprocessing import LabelEncoder
 
 df = pd.read_csv('stroke.csv')
@@ -141,16 +142,25 @@ print(df.head())
 X = df[['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi']]
 y = df['stroke']
 
+
+
+
 from sklearn.model_selection import train_test_split
 #random_state: set seed for random# generator
 #test_size: default 25% testing, 75% training
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
 
+from imblearn.under_sampling import RandomUnderSampler
+oversample = RandomOverSampler(sampling_strategy=0.5)
+
+# fit the object to the training data.
+X_train ,y_train = oversample.fit_resample(X,y)
+
 
 
 # kernals could be: ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’. Try them.
 from sklearn import svm
-clfsvm = svm.SVC(kernel='linear',class_weight='balanced')
+clfsvm = svm.SVC(kernel='linear')
 clfsvm.fit(X_train, y_train)
 y_pred=clfsvm.predict(X_test)
 
@@ -186,6 +196,11 @@ testFruit = pd.DataFrame([[35, 1, 1, 212.21,1,2,1,2,1,55]], columns=['age', 'hyp
 fruit_prediction = clfsvm.predict(testFruit)
 print(fruit_prediction)
 
+# second example: a small fruit with mass 15g, color_score = 5.5, width 4.3 cm, height 5.5 cm
+testFruit = pd.DataFrame([[25, 0, 0, 120.00,1,2,1,2,1,39]], columns=['age', 'hypertension', 'heart_disease','avg_glucose_level','gender','work_type','ever_married','Residence_type','smoking_status','bmi'])
+fruit_prediction = clfsvm.predict(testFruit)
+print(fruit_prediction)
+
 
 
 
@@ -197,3 +212,8 @@ print(fruit_prediction)
 from sklearn.metrics import confusion_matrix
 matrix=confusion_matrix(y_test,y_pred)
 print(matrix)
+
+from sklearn.metrics import plot_confusion_matrix
+
+#plot_confusion_matrix(clfsvm , X_test, y_test)
+#plt.show()
