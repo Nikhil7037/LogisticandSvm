@@ -215,5 +215,5 @@ print(matrix)
 
 from sklearn.metrics import plot_confusion_matrix
 
-#plot_confusion_matrix(clfsvm , X_test, y_test)
-#plt.show()
+plot_confusion_matrix(clfsvm , X_test, y_test)
+plt.show()

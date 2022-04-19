@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
+from imblearn.over_sampling import SMOTE, RandomOverSampler
 
 df = pd.read_csv('stroke.csv')
 #print(df)
@@ -149,8 +150,14 @@ from sklearn.model_selection import train_test_split
 #test_size: default 25% testing, 75% training
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
 
+from imblearn.under_sampling import RandomUnderSampler
+oversample = RandomOverSampler(sampling_strategy=0.5)
+
+# fit the object to the training data.
+X_train ,y_train = oversample.fit_resample(X,y)
+
 from sklearn.linear_model import LogisticRegression
-lr = LogisticRegression(solver='liblinear',class_weight={0:0.1,1:0.9} )
+lr = LogisticRegression(solver='liblinear' )
 lr.fit(X_train, y_train)
 y_pred=lr.predict(X_test)
 
